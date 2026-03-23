@@ -1,16 +1,86 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import { useRecipes } from "@/hooks/useRecipes";
+import { RecipeForm } from "@/components/RecipeForm";
+import { RecipeCard } from "@/components/RecipeCard";
+import { Input } from "@/components/ui/input";
+import { ChefHat, Search, UtensilsCrossed } from "lucide-react";
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+const Index = () => {
+  const { recipes, addRecipe, deleteRecipe, updateRecipe } = useRecipes();
+  const [search, setSearch] = useState("");
+
+  const filtered = recipes.filter(
+    (r) =>
+      r.name.toLowerCase().includes(search.toLowerCase()) ||
+      r.category.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="border-b bg-card/60 backdrop-blur-sm">
+        <div className="container mx-auto flex flex-col gap-4 px-4 py-8 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+              <UtensilsCrossed className="h-6 w-6" />
+            </div>
+            <div>
+              <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+                My Catering Kitchen
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                Recipe collection &amp; serving calculator
+              </p>
+            </div>
+          </div>
+          <RecipeForm onSave={addRecipe} />
+        </div>
+      </header>
+
+      {/* Main */}
+      <main className="container mx-auto px-4 py-8">
+        {recipes.length > 0 && (
+          <div className="relative mb-8 max-w-md">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search recipes or categories..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+        )}
+
+        {filtered.length > 0 ? (
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {filtered.map((recipe) => (
+              <RecipeCard
+                key={recipe.id}
+                recipe={recipe}
+                onDelete={deleteRecipe}
+                onUpdate={updateRecipe}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-muted">
+              <ChefHat className="h-10 w-10 text-muted-foreground" />
+            </div>
+            <h2 className="font-display text-2xl font-semibold">
+              {search ? "No recipes found" : "Your kitchen is empty"}
+            </h2>
+            <p className="mt-2 max-w-sm text-muted-foreground">
+              {search
+                ? "Try a different search term."
+                : "Start building your catering recipe collection. Add your first recipe and calculate ingredients for any number of servings."}
+            </p>
+            {!search && <div className="mt-6"><RecipeForm onSave={addRecipe} /></div>}
+          </div>
+        )}
+      </main>
     </div>
   );
 };
-
-const Index = PlaceholderIndex;
 
 export default Index;
