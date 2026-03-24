@@ -1,12 +1,24 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRecipes } from "@/hooks/useRecipes";
 import { RecipeForm } from "@/components/RecipeForm";
 import { RecipeCard } from "@/components/RecipeCard";
 import { Input } from "@/components/ui/input";
-import { ChefHat, Search, UtensilsCrossed } from "lucide-react";
+import { ChefHat, Search, UtensilsCrossed, Loader2 } from "lucide-react";
+import { seedBiryani } from "@/scripts/seedRecipe";
 
 const Index = () => {
-  const { recipes, addRecipe, deleteRecipe, updateRecipe } = useRecipes();
+  const { recipes, loading, addRecipe, deleteRecipe, updateRecipe } = useRecipes();
+
+  // One-time seed — remove after first load
+  useEffect(() => {
+    const seeded = localStorage.getItem("seeded-biryani");
+    if (!seeded) {
+      seedBiryani().then(() => {
+        localStorage.setItem("seeded-biryani", "true");
+        window.location.reload();
+      });
+    }
+  }, []);
   const [search, setSearch] = useState("");
 
   const filtered = recipes.filter(
@@ -51,7 +63,11 @@ const Index = () => {
           </div>
         )}
 
-        {filtered.length > 0 ? (
+        {loading ? (
+          <div className="flex items-center justify-center py-24">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
+        ) : filtered.length > 0 ? (
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {filtered.map((recipe) => (
               <RecipeCard

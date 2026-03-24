@@ -1,47 +1,68 @@
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Recipe } from "@/types/recipe";
-
-const STORAGE_KEY = "catering-recipes";
-
-const loadRecipes = (): Recipe[] => {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
-  } catch {
-    return [];
-  }
-};
-
-const saveRecipes = (recipes: Recipe[]) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(recipes));
-};
+import { supabase } from "@/integrations/supabase/client";
 
 export function useRecipes() {
-  const [recipes, setRecipes] = useState<Recipe[]>(loadRecipes);
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const addRecipe = useCallback((recipe: Recipe) => {
-    setRecipes((prev) => {
-      const next = [...prev, recipe];
-      saveRecipes(next);
-      return next;
-    });
+  const fetchRecipes = useCallback(async () => {
+    const { data, error } = await supabase
+      .from("recipes")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (!error && data) {
+      setRecipes(
+        data.map((r: any) => ({
+          id: r.id,
+          name: r.name,
+          description: r.description ?? "",
+          category: r.category ?? "Main Course",
+          baseServings: r.base_servings ?? 4,
+          instructions: r.instructions ?? "",
+          ingredients: r.ingredients ?? [],
+        }))
+      );
+    }
+    setLoading(false);
   }, []);
 
-  const deleteRecipe = useCallback((id: string) => {
-    setRecipes((prev) => {
-      const next = prev.filter((r) => r.id !== id);
-      saveRecipes(next);
-      return next;
+  useEffect(() => {
+    fetchRecipes();
+  }, [fetchRecipes]);
+
+  const addRecipe = useCallback(async (recipe: Recipe) => {
+    const { error } = await supabase.from("recipes").insert({
+      name: recipe.name,
+      description: recipe.description,
+      category: recipe.category,
+      base_servings: recipe.baseServings,
+      instructions: recipe.instructions,
+      ingredients: recipe.ingredients,
     });
+    if (!error) fetchRecipes();
+  }, [fetchRecipes]);
+
+  const deleteRecipe = useCallback(async (id: string) => {
+    const { error } = await supabase.from("recipes").delete().eq("id", id);
+    if (!error) setRecipes((prev) => prev.filter((r) => r.id !== id));
   }, []);
 
-  const updateRecipe = useCallback((recipe: Recipe) => {
-    setRecipes((prev) => {
-      const next = prev.map((r) => (r.id === recipe.id ? recipe : r));
-      saveRecipes(next);
-      return next;
-    });
-  }, []);
+  const updateRecipe = useCallback(async (recipe: Recipe) => {
+    const { error } = await supabase
+      .from("recipes")
+      .update({
+        name: recipe.name,
+        description: recipe.description,
+        category: recipe.category,
+        base_servings: recipe.baseServings,
+        instructions: recipe.instructions,
+        ingredients: recipe.ingredients,
+      })
+      .eq("id", recipe.id);
+    if (!error) fetchRecipes();
+  }, [fetchRecipes]);
 
-  return { recipes, addRecipe, deleteRecipe, updateRecipe };
+  return { recipes, loading, addRecipe, deleteRecipe, updateRecipe };
 }
