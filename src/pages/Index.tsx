@@ -18,10 +18,9 @@ const Index = () => {
         localStorage.setItem("seeded-biryani-v2", "true");
         window.location.reload();
       });
-        window.location.reload();
-      });
     }
   }, []);
+
   const [search, setSearch] = useState("");
 
   const filtered = recipes.filter(
