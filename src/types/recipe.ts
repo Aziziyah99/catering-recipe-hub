@@ -16,7 +16,7 @@ export interface Recipe {
 }
 
 export const UNITS = [
-  "g", "kg", "ml", "L", "cup", "tbsp", "tsp", "oz", "lb", "piece", "bunch", "clove", "pinch",
+  "lb", "oz", "cup", "tbsp", "tsp", "quart", "gallon", "pint", "piece", "bunch", "clove", "pinch", "g", "kg", "ml", "L",
 ] as const;
 
 export const CATEGORIES = [
