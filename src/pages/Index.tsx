@@ -63,7 +63,11 @@ const Index = () => {
           </div>
         )}
 
-        {filtered.length > 0 ? (
+        {loading ? (
+          <div className="flex items-center justify-center py-24">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
+        ) : filtered.length > 0 ? (
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {filtered.map((recipe) => (
               <RecipeCard
