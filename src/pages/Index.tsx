@@ -11,10 +11,13 @@ const Index = () => {
 
   // One-time seed — remove after first load
   useEffect(() => {
-    const seeded = localStorage.getItem("seeded-biryani");
+    const seeded = localStorage.getItem("seeded-biryani-v2");
     if (!seeded) {
+      localStorage.removeItem("seeded-biryani");
       seedBiryani().then(() => {
-        localStorage.setItem("seeded-biryani", "true");
+        localStorage.setItem("seeded-biryani-v2", "true");
+        window.location.reload();
+      });
         window.location.reload();
       });
     }

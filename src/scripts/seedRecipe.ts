@@ -2,6 +2,8 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export async function seedBiryani() {
+  // Remove old version first
+  await supabase.from("recipes").delete().eq("name", "Chicken Biryani");
   const { error } = await supabase.from("recipes").insert({
     name: "Chicken Biryani",
     description: "Fragrant basmati rice layered with spiced chicken, caramelized onions, and fresh herbs — a showstopper for any gathering.",
