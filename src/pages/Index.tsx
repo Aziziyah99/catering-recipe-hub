@@ -35,10 +35,8 @@ const Index = () => {
       {/* Header */}
       <header className="border-b bg-card/60 backdrop-blur-sm">
         <div className="container mx-auto flex flex-col gap-4 px-4 py-8 sm:flex-row sm:items-end sm:justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-              <UtensilsCrossed className="h-6 w-6" />
-            </div>
+<div className="flex items-center gap-3">
+            <img src={logo} alt="Rakhsha's Kitchen" className="h-14 w-auto" />
             <div>
               <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
                 My Catering Kitchen
