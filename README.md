@@ -1,3 +1,3 @@
-# Welcome to your Lovable project
+# Welcome to My Kitchen project
 
-TODO: Document your project here
+TODO: 
