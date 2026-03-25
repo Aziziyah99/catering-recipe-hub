@@ -3,8 +3,9 @@ import { useRecipes } from "@/hooks/useRecipes";
 import { RecipeForm } from "@/components/RecipeForm";
 import { RecipeCard } from "@/components/RecipeCard";
 import { Input } from "@/components/ui/input";
-import { ChefHat, Search, UtensilsCrossed, Loader2 } from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
 import { seedBiryani } from "@/scripts/seedRecipe";
+import logo from "@/assets/logo.png";
 
 const Index = () => {
   const { recipes, loading, addRecipe, deleteRecipe, updateRecipe } = useRecipes();
