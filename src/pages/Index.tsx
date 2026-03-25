@@ -3,8 +3,9 @@ import { useRecipes } from "@/hooks/useRecipes";
 import { RecipeForm } from "@/components/RecipeForm";
 import { RecipeCard } from "@/components/RecipeCard";
 import { Input } from "@/components/ui/input";
-import { ChefHat, Search, UtensilsCrossed, Loader2 } from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
 import { seedBiryani } from "@/scripts/seedRecipe";
+import logo from "@/assets/logo.png";
 
 const Index = () => {
   const { recipes, loading, addRecipe, deleteRecipe, updateRecipe } = useRecipes();
@@ -34,10 +35,8 @@ const Index = () => {
       {/* Header */}
       <header className="border-b bg-card/60 backdrop-blur-sm">
         <div className="container mx-auto flex flex-col gap-4 px-4 py-8 sm:flex-row sm:items-end sm:justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-              <UtensilsCrossed className="h-6 w-6" />
-            </div>
+<div className="flex items-center gap-3">
+            <img src={logo} alt="Rakhsha's Kitchen" className="h-14 w-auto" />
             <div>
               <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
                 My Catering Kitchen
@@ -83,7 +82,7 @@ const Index = () => {
         ) : (
           <div className="flex flex-col items-center justify-center py-24 text-center">
             <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-muted">
-              <ChefHat className="h-10 w-10 text-muted-foreground" />
+              <img src={logo} alt="Rakhsha's Kitchen" className="h-12 w-auto" />
             </div>
             <h2 className="font-display text-2xl font-semibold">
               {search ? "No recipes found" : "Your kitchen is empty"}
