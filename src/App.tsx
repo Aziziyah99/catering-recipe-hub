@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { BottomNav } from "@/components/BottomNav";
+import { PWAUpdatePrompt } from "@/components/PWAUpdatePrompt";
 import HomePage from "./pages/HomePage";
 import RecipesPage from "./pages/RecipesPage";
 import InventoryPage from "./pages/InventoryPage";
@@ -16,6 +17,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <PWAUpdatePrompt />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<HomePage />} />
