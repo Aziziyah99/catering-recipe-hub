@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trash2, Edit, AlertTriangle, Package } from "lucide-react";
 import { InventoryForm } from "./InventoryForm";
+import { useAuthContext } from "@/contexts/AuthContext";
 
 interface InventoryCardProps {
   item: InventoryItem;
@@ -11,6 +12,7 @@ interface InventoryCardProps {
 }
 
 export function InventoryCard({ item, onDelete, onUpdate }: InventoryCardProps) {
+  const { canEdit, isAdmin } = useAuthContext();
   const isLowStock = item.lowStockThreshold > 0 && item.quantity <= item.lowStockThreshold;
 
   return (
@@ -23,20 +25,24 @@ export function InventoryCard({ item, onDelete, onUpdate }: InventoryCardProps) 
             </span>
             <CardTitle className="font-display text-xl leading-tight">{item.name}</CardTitle>
           </div>
-          <div className="flex shrink-0 gap-1">
-            <InventoryForm
-              initial={item}
-              onSave={onUpdate}
-              trigger={
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
-                  <Edit className="h-4 w-4" />
+          {canEdit && (
+            <div className="flex shrink-0 gap-1">
+              <InventoryForm
+                initial={item}
+                onSave={onUpdate}
+                trigger={
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                }
+              />
+              {isAdmin && (
+                <Button variant="ghost" size="icon" onClick={() => onDelete(item.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
+                  <Trash2 className="h-4 w-4" />
                 </Button>
-              }
-            />
-            <Button variant="ghost" size="icon" onClick={() => onDelete(item.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
+              )}
+            </div>
+          )}
         </div>
       </CardHeader>
 
