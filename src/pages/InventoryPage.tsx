@@ -30,7 +30,7 @@ const InventoryPage = () => {
               Manage your grocery stock
             </p>
           </div>
-          <InventoryForm onSave={addItem} />
+          {canEdit && <InventoryForm onSave={addItem} />}
         </div>
       </header>
 
