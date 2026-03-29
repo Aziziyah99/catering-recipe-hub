@@ -75,7 +75,7 @@ const InventoryPage = () => {
                 ? "Try a different search term."
                 : "Start tracking your grocery stock. Add items and set low-stock alerts."}
             </p>
-            {!search && <div className="mt-6"><InventoryForm onSave={addItem} /></div>}
+            {!search && canEdit && <div className="mt-6"><InventoryForm onSave={addItem} /></div>}
           </div>
         )}
       </main>
