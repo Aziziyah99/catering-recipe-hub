@@ -4,11 +4,12 @@ import { InventoryForm } from "@/components/InventoryForm";
 import { InventoryCard } from "@/components/InventoryCard";
 import { Input } from "@/components/ui/input";
 import { Search, Loader2 } from "lucide-react";
+import { useAuthContext } from "@/contexts/AuthContext";
 import logo from "@/assets/logo.png";
 
 const InventoryPage = () => {
   const { items, loading, addItem, deleteItem, updateItem } = useInventory();
-  const [search, setSearch] = useState("");
+  const { canEdit } = useAuthContext();
 
   const filtered = items.filter(
     (i) =>
