@@ -10,6 +10,7 @@ import logo from "@/assets/logo.png";
 const InventoryPage = () => {
   const { items, loading, addItem, deleteItem, updateItem } = useInventory();
   const { canEdit } = useAuthContext();
+  const [search, setSearch] = useState("");
 
   const filtered = items.filter(
     (i) =>
