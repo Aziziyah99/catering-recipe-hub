@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Trash2, Edit, Users, ChefHat } from "lucide-react";
 import { RecipeForm } from "./RecipeForm";
+import { useAuthContext } from "@/contexts/AuthContext";
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -14,6 +15,7 @@ interface RecipeCardProps {
 }
 
 export function RecipeCard({ recipe, onDelete, onUpdate }: RecipeCardProps) {
+  const { canEdit, isAdmin } = useAuthContext();
   const [targetServings, setTargetServings] = useState(recipe.baseServings);
   const multiplier = targetServings / recipe.baseServings;
 
@@ -37,20 +39,24 @@ export function RecipeCard({ recipe, onDelete, onUpdate }: RecipeCardProps) {
               <p className="mt-1 text-sm text-muted-foreground">{recipe.description}</p>
             )}
           </div>
-          <div className="flex shrink-0 gap-1">
-            <RecipeForm
-              initial={recipe}
-              onSave={onUpdate}
-              trigger={
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
-                  <Edit className="h-4 w-4" />
+          {canEdit && (
+            <div className="flex shrink-0 gap-1">
+              <RecipeForm
+                initial={recipe}
+                onSave={onUpdate}
+                trigger={
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                }
+              />
+              {isAdmin && (
+                <Button variant="ghost" size="icon" onClick={() => onDelete(recipe.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
+                  <Trash2 className="h-4 w-4" />
                 </Button>
-              }
-            />
-            <Button variant="ghost" size="icon" onClick={() => onDelete(recipe.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
+              )}
+            </div>
+          )}
         </div>
       </CardHeader>
 

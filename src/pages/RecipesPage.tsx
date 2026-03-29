@@ -5,10 +5,12 @@ import { RecipeCard } from "@/components/RecipeCard";
 import { Input } from "@/components/ui/input";
 import { Search, Loader2 } from "lucide-react";
 import { seedBiryani } from "@/scripts/seedRecipe";
+import { useAuthContext } from "@/contexts/AuthContext";
 import logo from "@/assets/logo.png";
 
 const RecipesPage = () => {
   const { recipes, loading, addRecipe, deleteRecipe, updateRecipe } = useRecipes();
+  const { canEdit } = useAuthContext();
 
   useEffect(() => {
     const seeded = localStorage.getItem("seeded-biryani-v2");
@@ -41,7 +43,7 @@ const RecipesPage = () => {
               Recipe collection &amp; serving calculator
             </p>
           </div>
-          <RecipeForm onSave={addRecipe} />
+          {canEdit && <RecipeForm onSave={addRecipe} />}
         </div>
       </header>
 
@@ -86,7 +88,7 @@ const RecipesPage = () => {
                 ? "Try a different search term."
                 : "Start building your catering recipe collection."}
             </p>
-            {!search && <div className="mt-6"><RecipeForm onSave={addRecipe} /></div>}
+            {!search && canEdit && <div className="mt-6"><RecipeForm onSave={addRecipe} /></div>}
           </div>
         )}
       </main>

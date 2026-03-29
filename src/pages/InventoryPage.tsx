@@ -4,10 +4,12 @@ import { InventoryForm } from "@/components/InventoryForm";
 import { InventoryCard } from "@/components/InventoryCard";
 import { Input } from "@/components/ui/input";
 import { Search, Loader2 } from "lucide-react";
+import { useAuthContext } from "@/contexts/AuthContext";
 import logo from "@/assets/logo.png";
 
 const InventoryPage = () => {
   const { items, loading, addItem, deleteItem, updateItem } = useInventory();
+  const { canEdit } = useAuthContext();
   const [search, setSearch] = useState("");
 
   const filtered = items.filter(
@@ -28,7 +30,7 @@ const InventoryPage = () => {
               Manage your grocery stock
             </p>
           </div>
-          <InventoryForm onSave={addItem} />
+          {canEdit && <InventoryForm onSave={addItem} />}
         </div>
       </header>
 
@@ -73,7 +75,7 @@ const InventoryPage = () => {
                 ? "Try a different search term."
                 : "Start tracking your grocery stock. Add items and set low-stock alerts."}
             </p>
-            {!search && <div className="mt-6"><InventoryForm onSave={addItem} /></div>}
+            {!search && canEdit && <div className="mt-6"><InventoryForm onSave={addItem} /></div>}
           </div>
         )}
       </main>
