@@ -66,12 +66,19 @@ const LoginPage = () => {
               Sign In
             </Button>
           </form>
-          <p className="mt-4 text-center text-sm text-muted-foreground">
-            Don't have an account?{" "}
-            <Link to="/signup" className="text-primary hover:underline">
-              Sign Up
-            </Link>
-          </p>
+          <div className="mt-4 space-y-2 text-center text-sm text-muted-foreground">
+            <p>
+              <Link to="/forgot-password" className="text-primary hover:underline">
+                Forgot your password?
+              </Link>
+            </p>
+            <p>
+              Don't have an account?{" "}
+              <Link to="/signup" className="text-primary hover:underline">
+                Sign Up
+              </Link>
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>
