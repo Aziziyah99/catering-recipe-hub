@@ -14,21 +14,31 @@ const ResetPasswordPage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [isRecovery, setIsRecovery] = useState(false);
+  const [sessionReady, setSessionReady] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    // Listen for the PASSWORD_RECOVERY event
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+    // Listen for auth state changes - PASSWORD_RECOVERY means session is restored
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "PASSWORD_RECOVERY") {
         setIsRecovery(true);
+        setSessionReady(true);
+      } else if (event === "SIGNED_IN" && session) {
+        // Recovery tokens also trigger SIGNED_IN
+        const hash = window.location.hash;
+        if (hash.includes("type=recovery")) {
+          setIsRecovery(true);
+          setSessionReady(true);
+        }
       }
     });
 
-    // Also check URL hash for recovery type
+    // Check URL hash for recovery type and wait for session
     const hash = window.location.hash;
     if (hash.includes("type=recovery")) {
       setIsRecovery(true);
+      // Session will be ready once onAuthStateChange fires
     }
 
     return () => subscription.unsubscribe();
