@@ -12,16 +12,20 @@ export function useAuth() {
   const [roleLoading, setRoleLoading] = useState(false);
   const isMountedRef = useRef(true);
   const lastUserIdRef = useRef<string | null>(null);
+  const authReadyRef = useRef(false);
+  const roleRequestRef = useRef(0);
 
   const fetchRole = useCallback(async (userId: string) => {
+    const requestId = ++roleRequestRef.current;
     setRoleLoading(true);
+
     const { data, error } = await supabase
       .from("user_roles")
       .select("role")
       .eq("user_id", userId)
       .maybeSingle();
 
-    if (!isMountedRef.current) {
+    if (!isMountedRef.current || requestId !== roleRequestRef.current || lastUserIdRef.current !== userId) {
       return;
     }
 
@@ -30,10 +34,15 @@ export function useAuth() {
     } else {
       setRole(null);
     }
+
     setRoleLoading(false);
   }, []);
 
-  const syncSession = useCallback((nextSession: Session | null) => {
+  const applySession = useCallback((nextSession: Session | null, forceRoleRefresh = false) => {
+    if (!isMountedRef.current) {
+      return;
+    }
+
     const nextUser = nextSession?.user ?? null;
     const nextUserId = nextUser?.id ?? null;
     const userChanged = lastUserIdRef.current !== nextUserId;
@@ -43,19 +52,33 @@ export function useAuth() {
     setUser(nextUser);
 
     if (!nextUserId) {
+      roleRequestRef.current += 1;
       setRole(null);
       setRoleLoading(false);
       return;
     }
 
-    if (userChanged) {
+    if (userChanged || forceRoleRefresh) {
       void fetchRole(nextUserId);
     }
   }, [fetchRole]);
 
   useEffect(() => {
     isMountedRef.current = true;
-    let subscription: { unsubscribe: () => void } | null = null;
+    authReadyRef.current = false;
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      if (!isMountedRef.current) {
+        return;
+      }
+
+      applySession(nextSession, event === "SIGNED_IN" || event === "USER_UPDATED");
+
+      if (event !== "INITIAL_SESSION") {
+        authReadyRef.current = true;
+        setLoading(false);
+      }
+    });
 
     const initializeAuth = async () => {
       const { data: { session: initialSession } } = await supabase.auth.getSession();
@@ -64,28 +87,26 @@ export function useAuth() {
         return;
       }
 
-      syncSession(initialSession);
+      const currentUserId = lastUserIdRef.current;
+      const initialUserId = initialSession?.user?.id ?? null;
+      const shouldHydrateSession = !authReadyRef.current || (!!initialUserId && !currentUserId);
+
+      if (shouldHydrateSession) {
+        applySession(initialSession);
+      }
+
+      authReadyRef.current = true;
       setLoading(false);
-
-      const authListener = supabase.auth.onAuthStateChange((event, nextSession) => {
-        if (!isMountedRef.current || event === "INITIAL_SESSION") {
-          return;
-        }
-
-        syncSession(nextSession);
-        setLoading(false);
-      });
-
-      subscription = authListener.data.subscription;
     };
 
     void initializeAuth();
 
     return () => {
       isMountedRef.current = false;
-      subscription?.unsubscribe();
+      authReadyRef.current = false;
+      subscription.unsubscribe();
     };
-  }, [syncSession]);
+  }, [applySession]);
 
   const signUp = async (email: string, password: string) => {
     const { error } = await supabase.auth.signUp({
@@ -93,31 +114,28 @@ export function useAuth() {
       password,
       options: { emailRedirectTo: window.location.origin },
     });
+
     return { error };
   };
 
   const signIn = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
-    if (!error && data.session) {
-      lastUserIdRef.current = data.session.user.id;
-      setSession(data.session);
-      setUser(data.session.user);
+    if (!error) {
+      applySession(data.session ?? null, true);
       setLoading(false);
-      void fetchRole(data.session.user.id);
     }
 
     return { error };
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    lastUserIdRef.current = null;
-    setUser(null);
-    setSession(null);
-    setRole(null);
-    setRoleLoading(false);
-    setLoading(false);
+    const { error } = await supabase.auth.signOut();
+
+    if (!error) {
+      applySession(null);
+      setLoading(false);
+    }
   };
 
   const isAdmin = role === "admin";
