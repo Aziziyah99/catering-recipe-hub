@@ -9,9 +9,9 @@ interface Props {
 }
 
 export function ProtectedRoute({ children, requiredRole }: Props) {
-  const { user, role, loading } = useAuthContext();
+  const { user, role, loading, roleLoading } = useAuthContext();
 
-  if (loading) {
+  if (loading || (requiredRole === "admin" && roleLoading)) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
