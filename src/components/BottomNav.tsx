@@ -18,33 +18,60 @@ export function BottomNav() {
     return null;
   }
 
-  const tabs = isAdmin
+  const tabs = (isAdmin || location.pathname === "/admin")
     ? [...baseTabs, { to: "/admin", icon: Shield, label: "Admin" }]
     : baseTabs;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-card/95 backdrop-blur-md safe-bottom">
-      <div className="mx-auto flex max-w-lg items-center justify-around">
-        {tabs.map(({ to, icon: Icon, label }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={to === "/"}
-            className="flex flex-1 flex-col items-center gap-0.5 py-2 text-muted-foreground transition-colors"
-            activeClassName="text-primary"
+    <>
+      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-card/95 backdrop-blur-md safe-bottom md:hidden">
+        <div className="mx-auto flex max-w-lg items-center justify-around">
+          {tabs.map(({ to, icon: Icon, label }) => (
+            <NavLink
+              key={to}
+              to={to}
+              end={to === "/"}
+              className="flex flex-1 flex-col items-center gap-0.5 py-2 text-muted-foreground transition-colors"
+              activeClassName="text-primary"
+            >
+              <Icon className="h-5 w-5" />
+              <span className="text-[11px] font-medium">{label}</span>
+            </NavLink>
+          ))}
+          <button
+            onClick={signOut}
+            className="flex flex-1 flex-col items-center gap-0.5 py-2 text-muted-foreground transition-colors hover:text-destructive"
           >
-            <Icon className="h-5 w-5" />
-            <span className="text-[11px] font-medium">{label}</span>
-          </NavLink>
-        ))}
+            <LogOut className="h-5 w-5" />
+            <span className="text-[11px] font-medium">Logout</span>
+          </button>
+        </div>
+      </nav>
+
+      <nav className="fixed left-1/2 top-4 z-50 hidden w-[min(100%-2rem,56rem)] -translate-x-1/2 items-center justify-between rounded-full border bg-card/95 px-3 py-2 shadow-lg backdrop-blur-md md:flex">
+        <div className="flex items-center gap-1">
+          {tabs.map(({ to, icon: Icon, label }) => (
+            <NavLink
+              key={to}
+              to={to}
+              end={to === "/"}
+              className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              activeClassName="bg-accent text-foreground"
+            >
+              <Icon className="h-4 w-4" />
+              <span>{label}</span>
+            </NavLink>
+          ))}
+        </div>
+
         <button
           onClick={signOut}
-          className="flex flex-1 flex-col items-center gap-0.5 py-2 text-muted-foreground transition-colors hover:text-destructive"
+          className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-destructive"
         >
-          <LogOut className="h-5 w-5" />
-          <span className="text-[11px] font-medium">Logout</span>
+          <LogOut className="h-4 w-4" />
+          <span>Logout</span>
         </button>
-      </div>
-    </nav>
+      </nav>
+    </>
   );
 }

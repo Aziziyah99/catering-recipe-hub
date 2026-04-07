@@ -19,12 +19,28 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+const shouldEnablePWAUpdates = (() => {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  const isPreviewHost =
+    window.location.hostname.includes("id-preview--") ||
+    window.location.hostname.includes("lovableproject.com");
+
+  try {
+    return !isPreviewHost && window.self === window.top;
+  } catch {
+    return false;
+  }
+})();
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <PWAUpdatePrompt />
+      {shouldEnablePWAUpdates && <PWAUpdatePrompt />}
       <BrowserRouter>
         <AuthProvider>
           <Routes>
