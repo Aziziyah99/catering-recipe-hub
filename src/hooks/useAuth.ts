@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import type { User, Session } from "@supabase/supabase-js";
+import type { AuthChangeEvent, User, Session } from "@supabase/supabase-js";
 
 export type AppRole = "admin" | "editor" | "viewer";
 
@@ -38,25 +38,39 @@ export function useAuth() {
     setRoleLoading(false);
   }, []);
 
-  const applySession = useCallback((nextSession: Session | null, forceRoleRefresh = false) => {
+  const applySession = useCallback((
+    nextSession: Session | null,
+    options: { forceRoleRefresh?: boolean; event?: AuthChangeEvent } = {},
+  ) => {
     if (!isMountedRef.current) {
       return;
     }
 
+    const { forceRoleRefresh = false, event } = options;
     const nextUser = nextSession?.user ?? null;
     const nextUserId = nextUser?.id ?? null;
-    const userChanged = lastUserIdRef.current !== nextUserId;
-
-    lastUserIdRef.current = nextUserId;
-    setSession(nextSession);
-    setUser(nextUser);
+    const previousUserId = lastUserIdRef.current;
+    const userChanged = previousUserId !== nextUserId;
 
     if (!nextUserId) {
+      const shouldIgnoreTransientEmptySession = event !== "SIGNED_OUT" && authReadyRef.current && !!previousUserId;
+
+      if (shouldIgnoreTransientEmptySession) {
+        return;
+      }
+
+      lastUserIdRef.current = null;
+      setSession(null);
+      setUser(null);
       roleRequestRef.current += 1;
       setRole(null);
       setRoleLoading(false);
       return;
     }
+
+    lastUserIdRef.current = nextUserId;
+    setSession(nextSession);
+    setUser(nextUser);
 
     if (userChanged || forceRoleRefresh) {
       void fetchRole(nextUserId);
@@ -72,7 +86,10 @@ export function useAuth() {
         return;
       }
 
-      applySession(nextSession, event === "SIGNED_IN" || event === "USER_UPDATED");
+      applySession(nextSession, {
+        forceRoleRefresh: event === "SIGNED_IN" || event === "USER_UPDATED",
+        event,
+      });
 
       if (event !== "INITIAL_SESSION") {
         authReadyRef.current = true;
@@ -92,7 +109,7 @@ export function useAuth() {
       const shouldHydrateSession = !authReadyRef.current || (!!initialUserId && !currentUserId);
 
       if (shouldHydrateSession) {
-        applySession(initialSession);
+        applySession(initialSession, { event: "INITIAL_SESSION" });
       }
 
       authReadyRef.current = true;
@@ -122,7 +139,7 @@ export function useAuth() {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (!error) {
-      applySession(data.session ?? null, true);
+      applySession(data.session ?? null, { forceRoleRefresh: true, event: "SIGNED_IN" });
       setLoading(false);
     }
 
@@ -133,7 +150,7 @@ export function useAuth() {
     const { error } = await supabase.auth.signOut();
 
     if (!error) {
-      applySession(null);
+      applySession(null, { event: "SIGNED_OUT" });
       setLoading(false);
     }
   };
