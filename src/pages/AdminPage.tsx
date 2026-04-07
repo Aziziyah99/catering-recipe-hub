@@ -19,10 +19,16 @@ interface UserWithRole {
 const AdminPage = () => {
   const [users, setUsers] = useState<UserWithRole[]>([]);
   const [loading, setLoading] = useState(true);
-  const { user: currentUser } = useAuthContext();
+  const { user: currentUser, loading: authLoading, roleLoading } = useAuthContext();
   const { toast } = useToast();
 
   const fetchUsers = useCallback(async () => {
+    if (!currentUser?.id) {
+      return;
+    }
+
+    setLoading(true);
+
     // Fetch user_roles with user info
     const { data, error } = await supabase
       .from("user_roles")
@@ -49,8 +55,12 @@ const AdminPage = () => {
   }, [currentUser, toast]);
 
   useEffect(() => {
+    if (authLoading || roleLoading || !currentUser?.id) {
+      return;
+    }
+
     fetchUsers();
-  }, [fetchUsers]);
+  }, [authLoading, roleLoading, currentUser?.id, fetchUsers]);
 
   const updateRole = async (roleId: string, userId: string, newRole: AppRole) => {
     if (userId === currentUser?.id && newRole !== "admin") {
