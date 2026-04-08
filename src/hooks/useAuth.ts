@@ -53,7 +53,7 @@ export function useAuth() {
     const userChanged = previousUserId !== nextUserId;
 
     if (!nextUserId) {
-      const shouldIgnoreTransientEmptySession = event !== "SIGNED_OUT" && authReadyRef.current && !!previousUserId;
+      const shouldIgnoreTransientEmptySession = event !== "SIGNED_OUT" && !!previousUserId;
 
       if (shouldIgnoreTransientEmptySession) {
         return;

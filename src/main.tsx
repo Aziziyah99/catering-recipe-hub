@@ -19,6 +19,12 @@ if (isPreviewHost || isInIframe) {
   navigator.serviceWorker?.getRegistrations().then((registrations) => {
     registrations.forEach((r) => r.unregister());
   });
+
+  window.addEventListener("load", () => {
+    navigator.serviceWorker?.getRegistrations().then((registrations) => {
+      registrations.forEach((r) => r.unregister());
+    });
+  }, { once: true });
 }
 
 createRoot(document.getElementById("root")!).render(<App />);
