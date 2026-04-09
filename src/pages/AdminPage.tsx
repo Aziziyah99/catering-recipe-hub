@@ -19,7 +19,7 @@ interface UserWithRole {
 const AdminPage = () => {
   const [users, setUsers] = useState<UserWithRole[]>([]);
   const [loading, setLoading] = useState(true);
-  const { user: currentUser, loading: authLoading, roleLoading } = useAuthContext();
+  const { user: currentUser, authReady } = useAuthContext();
   const { toast } = useToast();
 
   const fetchUsers = useCallback(async () => {
@@ -55,12 +55,12 @@ const AdminPage = () => {
   }, [currentUser, toast]);
 
   useEffect(() => {
-    if (authLoading || roleLoading || !currentUser?.id) {
+    if (!authReady || !currentUser?.id) {
       return;
     }
 
     fetchUsers();
-  }, [authLoading, roleLoading, currentUser?.id, fetchUsers]);
+  }, [authReady, currentUser?.id, fetchUsers]);
 
   const updateRole = async (roleId: string, userId: string, newRole: AppRole) => {
     if (userId === currentUser?.id && newRole !== "admin") {
