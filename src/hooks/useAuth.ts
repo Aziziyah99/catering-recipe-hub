@@ -19,23 +19,34 @@ export function useAuth() {
     const requestId = ++roleRequestRef.current;
     setRoleLoading(true);
 
-    const { data, error } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId)
-      .maybeSingle();
+    try {
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId)
+        .maybeSingle();
 
-    if (!isMountedRef.current || requestId !== roleRequestRef.current || lastUserIdRef.current !== userId) {
-      return;
+      if (!isMountedRef.current || requestId !== roleRequestRef.current || lastUserIdRef.current !== userId) {
+        return;
+      }
+
+      if (error) {
+        console.error("Failed to fetch user role", error);
+        setRole(null);
+        return;
+      }
+
+      setRole(data?.role ? (data.role as AppRole) : null);
+    } catch (error) {
+      if (isMountedRef.current && requestId === roleRequestRef.current && lastUserIdRef.current === userId) {
+        console.error("Unexpected error while fetching user role", error);
+        setRole(null);
+      }
+    } finally {
+      if (isMountedRef.current && requestId === roleRequestRef.current && lastUserIdRef.current === userId) {
+        setRoleLoading(false);
+      }
     }
-
-    if (!error && data?.role) {
-      setRole(data.role as AppRole);
-    } else {
-      setRole(null);
-    }
-
-    setRoleLoading(false);
   }, []);
 
   const applySession = useCallback((
@@ -91,10 +102,8 @@ export function useAuth() {
         event,
       });
 
-      if (event !== "INITIAL_SESSION") {
-        authReadyRef.current = true;
-        setLoading(false);
-      }
+      authReadyRef.current = true;
+      setLoading(false);
     });
 
     const initializeAuth = async () => {
