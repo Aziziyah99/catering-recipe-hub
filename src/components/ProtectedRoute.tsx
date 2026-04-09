@@ -10,7 +10,7 @@ interface Props {
 
 export function ProtectedRoute({ children, requiredRole }: Props) {
   const { user, role, loading, roleLoading } = useAuthContext();
-  const waitingForAdminRole = requiredRole === "admin" && !!user && (roleLoading || role === null);
+  const waitingForAdminRole = requiredRole === "admin" && !!user && roleLoading;
 
   if (loading || waitingForAdminRole) {
     return (
