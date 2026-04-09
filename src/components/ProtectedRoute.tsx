@@ -10,11 +10,13 @@ interface Props {
 
 export function ProtectedRoute({ children, requiredRole }: Props) {
   const { user, role, loading, roleLoading } = useAuthContext();
-  const waitingForAdminRole =
-  requiredRole === "admin" &&
-  !!user &&
-  (roleLoading || role === null);
 
+  const waitingForAdminRole =
+    requiredRole === "admin" &&
+    !!user &&
+    (roleLoading || role === null);
+
+  // ⏳ Wait until everything is fully ready
   if (loading || waitingForAdminRole) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -23,10 +25,18 @@ export function ProtectedRoute({ children, requiredRole }: Props) {
     );
   }
 
+  // 🚫 Not logged in
   if (!user) return <Navigate to="/login" replace />;
 
-  if (requiredRole === "admin" && !roleLoading && role !== "admin") {
-  return <Navigate to="/" replace />;
-}
+  // 🚫 Not admin (ONLY after role is confirmed)
+  if (
+    requiredRole === "admin" &&
+    role !== null &&
+    role !== "admin"
+  ) {
+    return <Navigate to="/" replace />;
+  }
+
   return <>{children}</>;
 }
+
