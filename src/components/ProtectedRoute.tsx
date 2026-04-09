@@ -22,9 +22,8 @@ export function ProtectedRoute({ children, requiredRole }: Props) {
 
   if (!user) return <Navigate to="/login" replace />;
 
-  if (requiredRole === "admin" && role !== "admin") {
-    return <Navigate to="/" replace />;
-  }
-
+  if (requiredRole === "admin" && !roleLoading && role !== "admin") {
+  return <Navigate to="/" replace />;
+}
   return <>{children}</>;
 }
