@@ -155,8 +155,9 @@ export function useAuth() {
     }
   };
 
+  const authReady = !loading && (!user || !roleLoading);
   const isAdmin = role === "admin";
   const canEdit = role === "admin" || role === "editor";
 
-  return { user, session, role, loading, roleLoading, signUp, signIn, signOut, isAdmin, canEdit, fetchRole };
+  return { user, session, role, loading, roleLoading, authReady, signUp, signIn, signOut, isAdmin, canEdit, fetchRole };
 }

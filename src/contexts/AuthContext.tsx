@@ -8,6 +8,7 @@ interface AuthContextType {
   role: AppRole | null;
   loading: boolean;
   roleLoading: boolean;
+  authReady: boolean;
   signUp: (email: string, password: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
