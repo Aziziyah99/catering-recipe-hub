@@ -1,12 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { Recipe } from "@/types/recipe";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuthContext } from "@/contexts/AuthContext";
 
 export function useRecipes() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
-  const { authReady, user } = useAuthContext();
 
   const fetchRecipes = useCallback(async () => {
     const { data, error } = await supabase
@@ -31,19 +29,8 @@ export function useRecipes() {
   }, []);
 
   useEffect(() => {
-    if (!authReady) {
-      setLoading(true);
-      return;
-    }
-
-    if (!user) {
-      setRecipes([]);
-      setLoading(false);
-      return;
-    }
-
     fetchRecipes();
-  }, [authReady, user, fetchRecipes]);
+  }, [fetchRecipes]);
 
   const addRecipe = useCallback(async (recipe: Recipe) => {
     const { error } = await supabase.from("recipes").insert({

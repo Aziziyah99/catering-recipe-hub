@@ -1,12 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { InventoryItem } from "@/types/inventory";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuthContext } from "@/contexts/AuthContext";
 
 export function useInventory() {
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const { authReady, user } = useAuthContext();
 
   const fetchItems = useCallback(async () => {
     const { data, error } = await supabase
@@ -31,19 +29,8 @@ export function useInventory() {
   }, []);
 
   useEffect(() => {
-    if (!authReady) {
-      setLoading(true);
-      return;
-    }
-
-    if (!user) {
-      setItems([]);
-      setLoading(false);
-      return;
-    }
-
     fetchItems();
-  }, [authReady, user, fetchItems]);
+  }, [fetchItems]);
 
   const addItem = useCallback(async (item: InventoryItem) => {
     const { error } = await supabase.from("inventory").insert({
