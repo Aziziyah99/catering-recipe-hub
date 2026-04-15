@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -21,6 +21,8 @@ const AdminPage = () => {
   const [loading, setLoading] = useState(true);
   const { user: currentUser, loading: authLoading, roleLoading } = useAuthContext();
   const { toast } = useToast();
+
+  const fetchedRef = useRef(false);
 
   const fetchUsers = useCallback(async () => {
     if (!currentUser?.id) {
@@ -55,12 +57,13 @@ const AdminPage = () => {
   }, [currentUser, toast]);
 
   useEffect(() => {
-    if (authLoading || roleLoading || !currentUser?.id) {
+    if (authLoading || !currentUser?.id || fetchedRef.current) {
       return;
     }
 
+    fetchedRef.current = true;
     fetchUsers();
-  }, [authLoading, roleLoading, currentUser?.id, fetchUsers]);
+  }, [authLoading, currentUser?.id, fetchUsers]);
 
   const updateRole = async (roleId: string, userId: string, newRole: AppRole) => {
     if (userId === currentUser?.id && newRole !== "admin") {
