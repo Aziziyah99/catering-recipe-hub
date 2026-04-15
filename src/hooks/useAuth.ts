@@ -98,7 +98,7 @@ export function useAuth() {
       }
 
       applySession(nextSession, {
-        forceRoleRefresh: event === "SIGNED_IN" || event === "USER_UPDATED",
+        forceRoleRefresh: event === "USER_UPDATED",
         event,
       });
 
