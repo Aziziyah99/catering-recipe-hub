@@ -14,7 +14,7 @@ export function ProtectedRoute({ children, requiredRole }: Props) {
   const waitingForAdminRole =
     requiredRole === "admin" &&
     !!user &&
-    (roleLoading || role === null);
+    roleLoading;
 
   // ⏳ Wait until everything is fully ready
   if (loading || waitingForAdminRole) {
@@ -31,7 +31,6 @@ export function ProtectedRoute({ children, requiredRole }: Props) {
   // 🚫 Not admin (ONLY after role is confirmed)
   if (
     requiredRole === "admin" &&
-    role !== null &&
     role !== "admin"
   ) {
     return <Navigate to="/" replace />;
