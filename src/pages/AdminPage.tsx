@@ -5,8 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Shield, UserCog } from "lucide-react";
+import { Loader2, Shield, UserCog, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import type { AppRole } from "@/hooks/useAuth";
 
 interface UserWithRole {
@@ -79,6 +80,25 @@ const AdminPage = () => {
     }
   };
 
+  const removeUser = async (roleId: string, userId: string, email: string) => {
+    if (userId === currentUser?.id) {
+      toast({ title: "Cannot remove yourself", description: "You can't remove your own access.", variant: "destructive" });
+      return;
+    }
+
+    const { error } = await supabase
+      .from("user_roles")
+      .delete()
+      .eq("id", roleId);
+
+    if (error) {
+      toast({ title: "Failed to remove user", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "User removed", description: `${email} has been removed.` });
+      fetchUsers();
+    }
+  };
+
   const roleBadgeColor = (role: AppRole) => {
     switch (role) {
       case "admin": return "destructive";
@@ -145,19 +165,38 @@ const AdminPage = () => {
                     <div className="flex items-center gap-3">
                       <Badge variant={roleBadgeColor(u.role)}>{u.role}</Badge>
                       {u.user_id !== currentUser?.id && (
-                        <Select
-                          value={u.role}
-                          onValueChange={(val) => updateRole(u.role_id, u.user_id, val as AppRole)}
-                        >
-                          <SelectTrigger className="w-32">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="admin">Admin</SelectItem>
-                            <SelectItem value="editor">Editor</SelectItem>
-                            <SelectItem value="viewer">Viewer</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <>
+                          <Select
+                            value={u.role}
+                            onValueChange={(val) => updateRole(u.role_id, u.user_id, val as AppRole)}
+                          >
+                            <SelectTrigger className="w-32">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="admin">Admin</SelectItem>
+                              <SelectItem value="editor">Editor</SelectItem>
+                              <SelectItem value="viewer">Viewer</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive">
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Remove {u.email}?</AlertDialogTitle>
+                                <AlertDialogDescription>This will revoke all access for this user. They will no longer be able to use the app.</AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => removeUser(u.role_id, u.user_id, u.email)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Remove</AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </>
                       )}
                     </div>
                   </div>
