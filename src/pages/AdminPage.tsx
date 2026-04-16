@@ -31,11 +31,8 @@ const AdminPage = () => {
 
     setLoading(true);
 
-    // Fetch user_roles with user info
-    const { data, error } = await supabase
-      .from("user_roles")
-      .select("id, user_id, role")
-      .order("created_at", { ascending: true });
+    // Use security-definer function to get emails from auth.users
+    const { data, error } = await supabase.rpc("get_user_roles_with_email");
 
     if (error) {
       toast({ title: "Failed to load users", description: error.message, variant: "destructive" });
@@ -43,11 +40,9 @@ const AdminPage = () => {
       return;
     }
 
-    // We can't directly query auth.users from client, so we show user_id
-    // For a better UX, we'd use an edge function. For now, show IDs with current user labeled.
     const mapped: UserWithRole[] = (data || []).map((r: any) => ({
       user_id: r.user_id,
-      email: r.user_id === currentUser?.id ? currentUser.email || "You" : r.user_id.slice(0, 8) + "...",
+      email: r.email || r.user_id,
       role: r.role as AppRole,
       role_id: r.id,
     }));
