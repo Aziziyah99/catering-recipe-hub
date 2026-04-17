@@ -86,15 +86,12 @@ const AdminPage = () => {
       return;
     }
 
-    const { error } = await supabase
-      .from("user_roles")
-      .delete()
-      .eq("id", roleId);
+    const { error } = await supabase.rpc("delete_user_completely", { target_user_id: userId });
 
     if (error) {
       toast({ title: "Failed to remove user", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "User removed", description: `${email} has been removed.` });
+      toast({ title: "User removed", description: `${email} can no longer log in.` });
       fetchUsers();
     }
   };
