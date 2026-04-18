@@ -1,5 +1,5 @@
 # Welcome to My Kitchen project
 
-Name: Rakhsha's Kitchen
-URL: https://rakhsha-kitchen.netlify.app
+Name: Bismillah's Kitchen
+URL: https://bismillah-kitchen.netlify.app
 
