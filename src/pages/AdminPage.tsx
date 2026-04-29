@@ -161,7 +161,9 @@ const AdminPage = () => {
                       <div>
                         <p className="font-medium">
                           {u.email}
-                          {u.user_id === currentUser?.id && (
+                          {u.user_id !== currentUser?.id && u.user_id !== SUPER_ADMIN_ID && u.email !== SUPER_ADMIN_EMAIL && (
+                    
+
                             <Badge variant="outline" className="ml-2">You</Badge>
                           )}
                         </p>
