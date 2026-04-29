@@ -65,38 +65,29 @@ const AdminPage = () => {
     fetchUsers();
   }, [authLoading, currentUser?.id, fetchUsers]);
 
+
   const updateRole = async (roleId: string, userId: string, newRole: AppRole) => {
-    if (userId === SUPER_ADMIN_ID || userId === currentUser?.id && newRole !== "admin") {
-      // existing self-check stays...
-    }
-    // ADD THIS BLOCK FIRST:
-    if (userId === SUPER_ADMIN_ID) {
-      toast({ title: "Protected user", description: "The super admin's role cannot be changed.", variant: "destructive" });
-      return;
-    }
-    // ...rest of function unchanged
+  if (userId === SUPER_ADMIN_ID) {
+    toast({ title: "Protected user", description: "The super admin's role cannot be changed.", variant: "destructive" });
+    return;
+  }
+  if (userId === currentUser?.id && newRole !== "admin") {
+    toast({ title: "Cannot change your own role", description: "You can't remove your own admin access.", variant: "destructive" });
+    return;
+  }
 
-        if (userId === SUPER_ADMIN_ID) {
-      toast({ title: "Protected user", description: "The super admin's role cannot be changed.", variant: "destructive" });
-      return;
-    }
-    if (userId === currentUser?.id && newRole !== "admin") {
-      toast({ title: "Cannot change your own role", description: "You can't remove your own admin access.", variant: "destructive" });
-      return;
-    }
+  const { error } = await supabase
+    .from("user_roles")
+    .update({ role: newRole })
+    .eq("id", roleId);
 
-    const { error } = await supabase
-      .from("user_roles")
-      .update({ role: newRole })
-      .eq("id", roleId);
-
-    if (error) {
-      toast({ title: "Failed to update role", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Role updated" });
-      fetchUsers();
-    }
-  };
+  if (error) {
+    toast({ title: "Failed to update role", description: error.message, variant: "destructive" });
+  } else {
+    toast({ title: "Role updated" });
+    fetchUsers();
+  }
+};
 
   const removeUser = async (roleId: string, userId: string, email: string) => {
        if (userId === SUPER_ADMIN_ID || email === SUPER_ADMIN_EMAIL) {
