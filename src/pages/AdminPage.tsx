@@ -17,6 +17,10 @@ interface UserWithRole {
   role_id: string;
 }
 
+const SUPER_ADMIN_EMAIL = "reachwafia@gmail.com";
+const SUPER_ADMIN_ID = "34c05051-7c0f-4022-b17c-789299289538";
+
+
 const AdminPage = () => {
   const [users, setUsers] = useState<UserWithRole[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,6 +66,20 @@ const AdminPage = () => {
   }, [authLoading, currentUser?.id, fetchUsers]);
 
   const updateRole = async (roleId: string, userId: string, newRole: AppRole) => {
+    if (userId === SUPER_ADMIN_ID || userId === currentUser?.id && newRole !== "admin") {
+      // existing self-check stays...
+    }
+    // ADD THIS BLOCK FIRST:
+    if (userId === SUPER_ADMIN_ID) {
+      toast({ title: "Protected user", description: "The super admin's role cannot be changed.", variant: "destructive" });
+      return;
+    }
+    // ...rest of function unchanged
+
+        if (userId === SUPER_ADMIN_ID) {
+      toast({ title: "Protected user", description: "The super admin's role cannot be changed.", variant: "destructive" });
+      return;
+    }
     if (userId === currentUser?.id && newRole !== "admin") {
       toast({ title: "Cannot change your own role", description: "You can't remove your own admin access.", variant: "destructive" });
       return;
@@ -81,8 +99,8 @@ const AdminPage = () => {
   };
 
   const removeUser = async (roleId: string, userId: string, email: string) => {
-    if (userId === currentUser?.id) {
-      toast({ title: "Cannot remove yourself", description: "You can't remove your own access.", variant: "destructive" });
+       if (userId === SUPER_ADMIN_ID || email === SUPER_ADMIN_EMAIL) {
+      toast({ title: "Protected user", description: "The super admin cannot be removed.", variant: "destructive" });
       return;
     }
 
