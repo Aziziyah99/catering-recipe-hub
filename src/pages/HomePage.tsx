@@ -36,7 +36,7 @@ const HomePage = () => {
         <section className="rounded-xl bg-card p-6 shadow-sm border">
           <h2 className="font-display text-xl font-semibold mb-2">About the Kitchen</h2>
           <p className="text-muted-foreground leading-relaxed">
-            Welcome to Rakhsha's Kitchen — a passion-driven catering service bringing authentic, homemade flavors to every occasion. With years of experience crafting dishes that bring people together, our kitchen blends tradition with creativity. Every recipe is made with love, fresh ingredients, and a commitment to quality that you can taste in every bite.
+            Welcome to Bismillah Kitchen — a passion-driven catering service bringing authentic, homemade flavors to every occasion. With years of experience crafting dishes that bring people together, our kitchen blends tradition with creativity. Every recipe is made with love, fresh ingredients, and a commitment to quality that you can taste in every bite.
           </p>
         </section>
 
