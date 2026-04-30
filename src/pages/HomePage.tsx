@@ -22,7 +22,7 @@ const HomePage = () => {
           <img src={logo} alt="Rakhsha's Kitchen" className="h-14 w-auto" />
           <div>
             <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
-              My Catering Kitchen
+              Bismillah Kitchen
             </h1>
             <p className="text-sm text-muted-foreground">
               Recipe collection &amp; inventory manager
