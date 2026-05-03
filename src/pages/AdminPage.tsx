@@ -172,7 +172,7 @@ const AdminPage = () => {
                     </div>
                     <div className="flex items-center gap-3">
                       <Badge variant={roleBadgeColor(u.role)}>{u.role}</Badge>
-                      {u.user_id !== currentUser?.id && (
+                      {u.user_id !== currentUser?.id && u.user_id !== SUPER_ADMIN_ID && (
                         <>
                           <Select
                             value={u.role}
