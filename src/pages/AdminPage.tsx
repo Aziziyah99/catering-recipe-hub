@@ -161,12 +161,14 @@ const AdminPage = () => {
                       <div>
                         <p className="font-medium">
                           {u.email}
-                          {u.user_id !== currentUser?.id && u.user_id !== SUPER_ADMIN_ID && u.email !== SUPER_ADMIN_EMAIL && (
-                    
+                          {u.user_id === currentUser?.id && (
+                    <Badge variant="outline" 
+                      className="ml-2">You</Badge>
+                  )}
+                          </p>
+                          
 
-                            <Badge variant="outline" className="ml-2">You</Badge>
-                          )}
-                        </p>
+                          
                         <p className="text-xs text-muted-foreground">{u.user_id}</p>
                       </div>
                     </div>
