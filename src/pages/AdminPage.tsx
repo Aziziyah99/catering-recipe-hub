@@ -17,10 +17,6 @@ interface UserWithRole {
   role_id: string;
 }
 
-const SUPER_ADMIN_EMAIL = "reachwafia@gmail.com";
-const SUPER_ADMIN_ID = "34c05051-7c0f-4022-b17c-789299289538";
-
-
 const AdminPage = () => {
   const [users, setUsers] = useState<UserWithRole[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,17 +60,13 @@ const AdminPage = () => {
     fetchedRef.current = true;
     fetchUsers();
   }, [authLoading, currentUser?.id, fetchUsers]);
-
-
+  
   const updateRole = async (roleId: string, userId: string, newRole: AppRole) => {
-  if (userId === SUPER_ADMIN_ID) {
-    toast({ title: "Protected user", description: "The super admin's role cannot be changed.", variant: "destructive" });
-    return;
-  }
-  if (userId === currentUser?.id && newRole !== "admin") {
-    toast({ title: "Cannot change your own role", description: "You can't remove your own admin access.", variant: "destructive" });
-    return;
-  }
+    if (userId === currentUser?.id && newRole !== "admin") {
+      toast({ title: "Cannot change your own role", description: "You can't remove your own admin access.", variant: "destructive" });
+      return;
+    }
+
 
   const { error } = await supabase
     .from("user_roles")
@@ -88,12 +80,7 @@ const AdminPage = () => {
     fetchUsers();
   }
 };
-
-  const removeUser = async (roleId: string, userId: string, email: string) => {
-       if (userId === SUPER_ADMIN_ID || email === SUPER_ADMIN_EMAIL) {
-      toast({ title: "Protected user", description: "The super admin cannot be removed.", variant: "destructive" });
-      return;
-    }
+     const removeUser = async (roleId: string, userId: string, email: string) => {
 
     const { error } = await supabase.rpc("delete_user_completely", { target_user_id: userId });
 
@@ -172,43 +159,62 @@ const AdminPage = () => {
                         <p className="text-xs text-muted-foreground">{u.user_id}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <Badge variant={roleBadgeColor(u.role)}>{u.role}</Badge>
-                      {u.user_id !== currentUser?.id && u.user_id !== SUPER_ADMIN_ID && (
-                        <>
-                          <Select
-                            value={u.role}
-                            onValueChange={(val) => updateRole(u.role_id, u.user_id, val as AppRole)}
-                          >
-                            <SelectTrigger className="w-32">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="admin">Admin</SelectItem>
-                              <SelectItem value="editor">Editor</SelectItem>
-                              <SelectItem value="viewer">Viewer</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive">
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Remove {u.email}?</AlertDialogTitle>
-                                <AlertDialogDescription>This will revoke all access for this user. They will no longer be able to use the app.</AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => removeUser(u.role_id, u.user_id, u.email)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Remove</AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </>
-                      )}
+                    
+                      <div className="flex items-center gap-3">
+                      {(() => {
+                        const isSelf = u.user_id === currentUser?.id;
+                        return (
+                          <>
+                            <Badge variant={roleBadgeColor(u.role)}>{u.role}</Badge>
+                            <Select
+                              value={u.role}
+                              disabled={isSelf}
+                              onValueChange={(val) => updateRole(u.role_id, u.user_id, val as AppRole)}
+                            >
+                              <SelectTrigger className="w-32">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="admin">Admin</SelectItem>
+                                <SelectItem value="editor">Editor</SelectItem>
+                                <SelectItem value="viewer">Viewer</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  disabled={isSelf}
+                                  className="h-8 w-8 text-muted-foreground hover:text-destructive disabled:opacity-40"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Remove {u.email}?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This will revoke all access for this user. They will no longer be able to use the app.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => removeUser(u.role_id, u.user_id, u.email)}
+                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                  >
+                                    Remove
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </>
+                        );
+                      })()}
                     </div>
+
+                      
                   </div>
                 ))}
               </div>
