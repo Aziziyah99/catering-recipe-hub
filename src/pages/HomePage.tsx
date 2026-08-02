@@ -1,14 +1,21 @@
 import { useRecipes } from "@/hooks/useRecipes";
 import { useInventory } from "@/hooks/useInventory";
+import { ChefHat, Package, AlertTriangle, HeartHandshake } from "lucide-react";
+import { useVolunteerHours } from "@/hooks/useVolunteerHours";
 import { ChefHat, Package, AlertTriangle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import logo from "@/assets/logo.png";
 
+
 const HomePage = () => {
   const { recipes } = useRecipes();
   const { items } = useInventory();
+  const { entries } = useVolunteerHours();
   const navigate = useNavigate();
+
+  const totalVolunteerHours = entries.reduce((sum, e) => sum + e.completedHours, 0);
+
 
   const lowStockItems = items.filter(
     (i) => i.lowStockThreshold > 0 && i.quantity <= i.lowStockThreshold
@@ -68,6 +75,21 @@ const HomePage = () => {
               <div>
                 <p className="text-sm text-muted-foreground">Inventory Items</p>
                 <p className="font-display text-3xl font-bold">{items.length}</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card
+            className="cursor-pointer transition-shadow hover:shadow-lg"
+            onClick={() => navigate("/volunteers")}
+          >
+            <CardContent className="flex items-center gap-4 p-6">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                <HeartHandshake className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Volunteer Hours</p>
+                <p className="font-display text-3xl font-bold">{totalVolunteerHours} <span className="text-base font-normal text-muted-foreground">hrs</span></p>
               </div>
             </CardContent>
           </Card>
