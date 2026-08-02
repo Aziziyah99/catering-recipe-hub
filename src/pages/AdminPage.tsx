@@ -17,6 +17,13 @@ interface UserWithRole {
   role_id: string;
 }
 
+interface RoleRow {
+  id: string;
+  user_id: string;
+  email: string | null;
+  role: string;
+}
+
 const AdminPage = () => {
   const [users, setUsers] = useState<UserWithRole[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,13 +47,15 @@ const AdminPage = () => {
       setLoading(false);
       return;
     }
-
+    
     const mapped: UserWithRole[] = (data || []).map((r: any) => ({
       user_id: r.user_id,
-      email: r.email || r.user_id,
-      role: r.role as AppRole,
-      role_id: r.id,
+      email: r.email || r.user_id,role: r.role as AppRole,
+    role_id: r.id,
     }));
+
+
+    
 
     setUsers(mapped);
     setLoading(false);
@@ -146,15 +155,14 @@ const AdminPage = () => {
                         {u.email[0]?.toUpperCase()}
                       </div>
                       <div>
+
                         <p className="font-medium">
                           {u.email}
                           {u.user_id === currentUser?.id && (
-                    <Badge variant="outline" 
-                      className="ml-2">You</Badge>
-                  )}
-                          </p>
-                          
-
+                            <Badge variant="outline" 
+                        className="ml-2">You</Badge>
+                            )}
+                            </p>
                           
                         <p className="text-xs text-muted-foreground">{u.user_id}</p>
                       </div>
@@ -165,12 +173,12 @@ const AdminPage = () => {
                         const isSelf = u.user_id === currentUser?.id;
                         return (
                           <>
-                            <Badge variant={roleBadgeColor(u.role)}>{u.role}</Badge>
-                            <Select
-                              value={u.role}
-                              disabled={isSelf}
-                              onValueChange={(val) => updateRole(u.role_id, u.user_id, val as AppRole)}
-                            >
+                          <Badge variant={roleBadgeColor(u.role)}>{u.role}</Badge>
+                          <Select
+                          value={u.role}
+                          disabled={isSelf}
+                          onValueChange={(val) => updateRole(u.role_id, u.user_id, val as AppRole)}
+                          >
                               <SelectTrigger className="w-32">
                                 <SelectValue />
                               </SelectTrigger>
