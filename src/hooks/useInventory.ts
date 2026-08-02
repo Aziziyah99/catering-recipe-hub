@@ -2,6 +2,16 @@ import { useState, useEffect, useCallback } from "react";
 import { InventoryItem } from "@/types/inventory";
 import { supabase } from "@/integrations/supabase/client";
 
+interface InventoryRow {
+  id: string;
+  name: string;
+  quantity: number | string;
+  unit: string | null;
+  category: string | null;
+  low_stock_threshold: number | string | null;
+  notes: string | null;
+}
+
 export function useInventory() {
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -12,9 +22,9 @@ export function useInventory() {
       .select("*")
       .order("created_at", { ascending: false });
 
-    if (!error && data) {
+     if (!error && data) {
       setItems(
-        data.map((r: any) => ({
+        (data as InventoryRow[]).map((r) => ({
           id: r.id,
           name: r.name,
           quantity: Number(r.quantity),
