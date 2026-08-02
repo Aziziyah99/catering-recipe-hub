@@ -2,6 +2,18 @@ import { useState, useEffect, useCallback } from "react";
 import { Recipe } from "@/types/recipe";
 import { supabase } from "@/integrations/supabase/client";
 
+
+interface RecipeRow {
+  id: string;
+  name: string;
+  description: string | null;
+  category: string | null;
+  base_servings: number | null;
+  instructions: string | null;
+  ingredients: Recipe["ingredients"] | null;
+}
+
+
 export function useRecipes() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
@@ -14,7 +26,7 @@ export function useRecipes() {
 
     if (!error && data) {
       setRecipes(
-        data.map((r: any) => ({
+        (data as RecipeRow[]).map((r) => ({
           id: r.id,
           name: r.name,
           description: r.description ?? "",
