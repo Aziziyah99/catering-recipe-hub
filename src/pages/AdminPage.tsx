@@ -9,6 +9,7 @@ import { Loader2, Shield, UserCog, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import type { AppRole } from "@/hooks/useAuth";
+import AdminVolunteerOverview from "@/components/AdminVolunteerOverview";
 
 interface UserWithRole {
   user_id: string;
@@ -229,6 +230,9 @@ const AdminPage = () => {
             )}
           </CardContent>
         </Card>
+         
+
+        <AdminVolunteerOverview />
       </main>
     </div>
   );
